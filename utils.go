@@ -15,13 +15,13 @@ func ConvertColor(c color.Color) Pixel {
 	rColor, gColor, bColor, aColor := c.RGBA()
 	if(aColor == 0) {
 		return Pixel{0, 0, 0, 0}
-	} else {
-		r := float32(rColor) / float32(aColor)
-		g := float32(gColor) / float32(aColor)
-		b := float32(bColor) / float32(aColor)
-		a := float32(aColor) / float32(aColor)
-		return Pixel{r, g, b, a}
 	}
+	
+	r := float32(rColor) / float32(aColor)
+	g := float32(gColor) / float32(aColor)
+	b := float32(bColor) / float32(aColor)
+	a := float32(aColor) / float32(aColor)
+	return Pixel{r, g, b, a}
 }
 
 // GetColorFromPixel converts Pixel to color.Color
