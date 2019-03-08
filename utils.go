@@ -1,14 +1,6 @@
 package gfilter
 
-import "color"
-
-// RoundD helps round down from float64 to uint
-func RoundD(val float32) uint {
-	if val > 0 {
-		return uint(val+1.0)
-	}
-	return uint(val-1.0)
-}
+import "image/color"
 
 // ConvertColor converts color.Color to Pixel
 func ConvertColor(c color.Color) Pixel {
@@ -28,22 +20,22 @@ func ConvertColor(c color.Color) Pixel {
 func GetColorFromPixel(px Pixel, imageType ImageType) (color.Color, error) {
 	switch(imageType) {
 	case ImageTypeNRGBA:
-		return color.NRGBA{R: RoundD(px.r), G: RoundD(px.g), B: RoundD(px.b), A: RoundD(px.a)}, nil
+		return color.NRGBA{R: uint8(px.r), G: uint8(px.g), B: uint8(px.b), A: uint8(px.a)}, nil
 
 	case ImageTypeNRGBA64:
-		return color.NRGBA64{R: RoundD(px.r), G: RoundD(px.g), B: RoundD(px.b), A: RoundD(px.a)}, nil
+		return color.NRGBA64{R: uint16(px.r), G: uint16(px.g), B: uint16(px.b), A: uint16(px.a)}, nil
 
 	case ImageTypeRGBA:
-		return color.RGBA{R: RoundD(px.r), G: RoundD(px.g), B: RoundD(px.b), A: RoundD(px.a)}, nil
+		return color.RGBA{R: uint8(px.r), G: uint8(px.g), B: uint8(px.b), A: uint8(px.a)}, nil
 
 	case ImageTypeRGBA64:
-		return color.RGBA64{R: RoundD(px.r), G: RoundD(px.g), B: RoundD(px.b), A: RoundD(px.a)}, nil
+		return color.RGBA64{R: uint16(px.r), G: uint16(px.g), B: uint16(px.b), A: uint16(px.a)}, nil
 
 	case ImageTypeGray:
 		return color.Gray{uint8(0.299*px.r + 0.587*px.g + 0.114*px.b / 256)}, nil
 
 	case ImageTypeGray16:
-		return color.Gray16{uint8(0.299*px.r + 0.587*px.g + 0.114*px.b / 256)}, nil
+		return color.Gray16{uint16(0.299*px.r + 0.587*px.g + 0.114*px.b / 256)}, nil
 
 	default:
 		return nil, ErrUnsupportedImageFormat

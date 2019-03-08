@@ -1,13 +1,8 @@
 package gfilter
 
 import (
-	"encoding/base64"
-	"fmt"
+	"os"
 	"image"
-	"log"
-	"strings"
-	"color"
-	// Package image/jpeg is not used explicitly in the code below,
 	// but is imported for its initialization side-effect, which allows
 	// image.Decode to understand JPEG formatted images. Uncomment these
 	// two lines to also understand GIF and PNG images:
@@ -36,11 +31,9 @@ type Pixel struct {
 
 // ImageHandler interface for polymorphism
 type ImageHandler interface {
-	Image image.Image
-	ImageType ImageType
 	At(row, column int) (Pixel, error)
-	Set(row, column int, px Pixel)
-	Mode() int
+	Set(row, column int, px Pixel) error
+	Mode() ImageType
 }
 
 // NRGBAImageHandler struct to handle NRGBA Image
@@ -51,17 +44,26 @@ type NRGBAImageHandler struct {
 
 // At returns the Pixel at row and column of the image
 func (handler *NRGBAImageHandler) At(row, column int) (Pixel, error) {
-	return ConvertColor(handler.Image.At(row, Column))
+	rect := handler.Image.Bounds()
+	if (row >= rect.Min.X && row <= rect.Max.X) || (column >= rect.Min.Y && column <= rect.Max.Y) {
+		return Pixel{}, ErrRowColumnOutOfBounds
+	}
+	return ConvertColor(handler.Image.At(row, column)), nil
 }
 
 // Set sets the Pixel at row and column of the image
-func (handler *NRGBAImageHandler) Set(row, column int, px Pixel) {
-	color.Color setColor = GetColorFromPixel(px, handler.ImageType)
+func (handler *NRGBAImageHandler) Set(row, column int, px Pixel) error {
+	setColor, err := GetColorFromPixel(px, handler.ImageType)
+	if err != nil {
+		return err
+	}
+
 	handler.Image.set(row, column, setColor)
+	return nil
 }
 
 // Mode returns the ImageType for the image
-func (handler *NRGBAImageHandler) Mode() int {
+func (handler *NRGBAImageHandler) Mode() ImageType {
 	return handler.ImageType;
 }
 
@@ -73,17 +75,26 @@ type NRGBA64ImageHandler struct {
 
 // At retuns the Pixel at row and column of the image
 func (handler *NRGBA64ImageHandler) At(row, column int) (Pixel, error) {
-	return ConvertColor(handler.Image.At(row, column))
+	rect := handler.Image.Bounds()
+	if (row >= rect.Min.X && row <= rect.Max.X) || (column >= rect.Min.Y && column <= rect.Max.Y) {
+		return Pixel{}, ErrRowColumnOutOfBounds
+	}
+	return ConvertColor(handler.Image.At(row, column)), nil
 }
 
 // Set sets the Pixel at row and column of the image
-func (handler *NRGBA64ImageHandler) Set(row, column int, px Pixel) {
-	color.Color setColor = GetColorFromPixel(px, handler.ImageType)
+func (handler *NRGBA64ImageHandler) Set(row, column int, px Pixel) error {
+	setColor, err := GetColorFromPixel(px, handler.ImageType)
+	if err != nil {
+		return err
+	}
+
 	handler.Image.set(row, column, setColor)
+	return nil
 }
 
 // Mode returns the ImageType of the images
-func (handler *NRGBA64ImageHandler) Mode() int {
+func (handler *NRGBA64ImageHandler) Mode() ImageType {
 	return handler.ImageType;
 }
 
@@ -95,17 +106,26 @@ type RGBAImageHandler struct {
 
 // At returns the Pixel at row and column of the image
 func (handler *RGBAImageHandler) At(row, column int) (Pixel, error) {
-	return ConvertColor(handler.Image.At(row, Column))
+	rect := handler.Image.Bounds()
+	if (row >= rect.Min.X && row <= rect.Max.X) || (column >= rect.Min.Y && column <= rect.Max.Y) {
+		return Pixel{}, ErrRowColumnOutOfBounds
+	}
+	return ConvertColor(handler.Image.At(row, column)), nil
 }
 
 // Set sets the Pixel at row and column of the image
-func (handler *RGBAImageHandler) Set(row, column int, px Pixel) {
-	color.Color setColor = GetColorFromPixel(px, handler.ImageType)
+func (handler *RGBAImageHandler) Set(row, column int, px Pixel) error {
+	setColor, err := GetColorFromPixel(px, handler.ImageType)
+	if err != nil {
+		return err
+	}
+
 	handler.Image.set(row, column, setColor)
+	return nil
 }
 
 // Mode returns the ImageType of the images
-func (handler *RGBAImageHandler) Mode() int {
+func (handler *RGBAImageHandler) Mode() ImageType {
 	return handler.ImageType;
 }
 
@@ -117,57 +137,106 @@ type RGBA64ImageHandler struct {
 
 // At returns the Pixel at row and column of the image
 func (handler *RGBA64ImageHandler) At(row, column int) (Pixel, error) {
-	return ConvertColor(handler.Image.At(row, column))
+	rect := handler.Image.Bounds()
+	if (row >= rect.Min.X && row <= rect.Max.X) || (column >= rect.Min.Y && column <= rect.Max.Y) {
+		return Pixel{}, ErrRowColumnOutOfBounds
+	}
+	return ConvertColor(handler.Image.At(row, column)), nil
 }
 
 // Set sets the Pixel at row and column of the image
-func (handler *RGBA64ImageHandler) Set(row, column int, px Pixel) {
-	color.Color setColor = GetColorFromPixel(px, handler.ImageType); 
-	handler.Image.set(row, column, setColor);
+func (handler *RGBA64ImageHandler) Set(row, column int, px Pixel) error {
+	setColor, err := GetColorFromPixel(px, handler.ImageType)
+	if err != nil {
+		return err
+	}
+
+	handler.Image.set(row, column, setColor)
+	return nil
 }
 
 // Mode returns the ImageType of the images
-func (handler *RGBA64ImageHandler) Mode() int {
+func (handler *RGBA64ImageHandler) Mode() ImageType {
+	return handler.ImageType;
+}
+
+// GrayImageHandler struct to handle the Gray Image
+type GrayImageHandler struct {
+	Image image.Image
+	ImageType ImageType
+}
+
+// At returns the Pixel at row and column of the image
+func (handler *GrayImageHandler) At(row, column int) (Pixel, error) {
+	rect := handler.Image.Bounds()
+	if (row >= rect.Min.X && row <= rect.Max.X) || (column >= rect.Min.Y && column <= rect.Max.Y) {
+		return Pixel{}, ErrRowColumnOutOfBounds
+	}
+	return ConvertColor(handler.Image.At(row, column)), nil
+}
+
+// Set sets the Pixel at row and column of the image
+func (handler *GrayImageHandler) Set(row, column int, px Pixel) error {
+	setColor, err := GetColorFromPixel(px, handler.ImageType)
+	if err != nil {
+		return err
+	}
+
+	handler.Image.set(row, column, setColor)
+	return nil
+}
+
+// Mode returns the ImageType of the images
+func (handler *GrayImageHandler) Mode() ImageType {
 	return handler.ImageType;
 }
 
 // Gray16ImageHandler struct to handle the Gray16 Image
 type Gray16ImageHandler struct {
-	Image image.ImageType
+	Image image.Image
 	ImageType ImageType
 }
 
 // At returns the Pixel at row and column of the image
 func (handler *Gray16ImageHandler) At(row, column int) (Pixel, error) {
-	return ConvertColor(handler.Image.At(row, column))
+	rect := handler.Image.Bounds()
+	if (row >= rect.Min.X && row <= rect.Max.X) || (column >= rect.Min.Y && column <= rect.Max.Y) {
+		return Pixel{}, ErrRowColumnOutOfBounds
+	}
+	return ConvertColor(handler.Image.At(row, column)), nil
 }
 
 // Set sets the Pixel at row and column of the image
-func (handler *Gray16ImageHandler) Set(row, column int, px Pixel) {
-	color.Color setColor = GetColorFromPixel(px, handler.ImageType); 
-	handler.Image.set(row, column, setColor);
+func (handler *Gray16ImageHandler) Set(row, column int, px Pixel) error {
+	setColor, err := GetColorFromPixel(px, handler.ImageType)
+	if err != nil {
+		return err
+	}
+
+	handler.Image.set(row, column, setColor)
+	return nil
 }
 
 // Mode returns the ImageType of the images
-func (handler *Gray16ImageHandler) Mode() int {
+func (handler *Gray16ImageHandler) Mode() ImageType {
 	return handler.ImageType;
 }
 
 // ReadImage reads the image from the specified path
 // it will return the interface ImageHandler of the 
 // correct type specified in the image
-func ReadImage(path string) (*ImageHandler, error) {
+func ReadImage(path string) (ImageHandler, error) {
 	reader, err := os.Open(path)
 	if err != nil {
 		return nil, err
 	}
 
-	img, err := image.Decode(reader)
+	img, _, err := image.Decode(reader)
 	if err != nil {
 		return nil, err
 	}
 
-	switch imgT := img.(type); imgT {
+	switch imgT := img.(type) {
 	case *image.NRGBA:
 		return &NRGBAImageHandler{
 			Image: img,
@@ -178,7 +247,7 @@ func ReadImage(path string) (*ImageHandler, error) {
 		return &NRGBA64ImageHandler{
 			Image: img,
 			ImageType: ImageTypeNRGBA64,
-		}
+		}, nil
 
 	case *image.RGBA:
 		return &RGBAImageHandler{
