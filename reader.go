@@ -6,7 +6,7 @@ import (
 	"image"
 	"log"
 	"strings"
-
+	"color"
 	// Package image/jpeg is not used explicitly in the code below,
 	// but is imported for its initialization side-effect, which allows
 	// image.Decode to understand JPEG formatted images. Uncomment these
@@ -16,17 +16,16 @@ import (
 	_ "image/jpeg"
 )
 
+type ImageType int
+
 // 
 const (
-	ImageType int iota
-	ImageTypeNRGBA
+	ImageTypeNRGBA = ImageType(iota)
 	ImageTypeNRGBA64
 	ImageTypeRGBA
 	ImageTypeRGBA64
-	ImageTypeYCbCr
 	ImageTypeGray
 	ImageTypeGray16
-	ImageTypePaletted
 )
 
 type Pixel struct {
@@ -35,38 +34,101 @@ type Pixel struct {
 
 type ImageHandler interface {
 	Image image.Image
-	ImageType int
+	ImageType ImageType
 	At(row, column int) (Pixel, error)
-	Set(row, column int, px Pixel) (error)
-	Mode() (int, error)
+	Set(row, column int, px Pixel)
+	Mode() int
 }
 
 type NRGBAImageHandler struct {
 	Image image.Image
-	ImageType int
+	ImageType ImageType
 }
 
-func (handler *NRGBAImageHandler) At(row, column int) Pixel {
+func (handler *NRGBAImageHandler) At(row, column int) (Pixel, error) {
 	return ConvertColor(handler.Image.At(row, Column))
 }
 
 func (handler *NRGBAImageHandler) Set(row, column int, px Pixel) {
-	
+	color.Color setColor = GetColorFromPixel(px, handler.ImageType)
+	handler.Image.set(row, column, setColor)
 }
 
-func ConvertColor(c color.Color) Pixel {
-	rColor, gColor, bColor, aColor := c.RGBA()
-	if(aColor == 0) {
-		return Pixel{0, 0, 0, 0}
-	} else {
-		r := float32(rColor) / float32(aColor)
-		g := float32(gColor) / float32(aColor)
-		b := float32(bColor) / float32(aColor)
-		a := float32(aColor) / float32(aColor)
-		return Pixel{r, g, b, a}
-	}
+func (handler *NRGBAImageHandler) Mode() int {
+	return handler.ImageType;
 }
 
+type NRGBA64ImageHandler struct {
+	Image image.Image
+	ImageType ImageType
+}
+
+func (handler *NRGBA64ImageHandler) At(row, column int) (Pixel, error) {
+	return ConvertColor(handler.Image.At(row, column))
+}
+
+func (handler *NRGBA64ImageHandler) Set(row, column int, px Pixel) {
+	color.Color setColor = GetColorFromPixel(px, handler.ImageType)
+	handler.Image.set(row, column, setColor)
+}
+
+func (handler *NRGBA64ImageHandler) Mode() int {
+	return handler.ImageType;
+}
+
+type RGBAImageHandler struct {
+	Image image.Image
+	ImageType ImageType
+}
+
+func (handler *RGBAImageHandler) At(row, column int) (Pixel, error) {
+	return ConvertColor(handler.Image.At(row, Column))
+}
+
+func (handler *RGBAImageHandler) Set(row, column int, px Pixel) {
+	color.Color setColor = GetColorFromPixel(px, handler.ImageType)
+	handler.Image.set(row, column, setColor)
+}
+
+func (handler *RGBAImageHandler) Mode() int {
+	return handler.ImageType;
+}
+
+type RGBA64ImageHandler struct {
+	Image image.Image
+	ImageType ImageType
+}
+
+func (handler *RGBA64ImageHandler) At(row, column int) (Pixel, error) {
+	return ConvertColor(handler.Image.At(row, column))
+}
+
+func (handler *RGBA64ImageHandler) Set(row, column int, px Pixel) {
+	color.Color setColor = GetColorFromPixel(px, handler.ImageType); 
+	handler.Image.set(row, column, setColor);
+}
+
+func (handler *RGBA64ImageHandler) Mode() int {
+	return handler.ImageType;
+}
+
+type Gray16ImageHandler struct {
+	Image image.ImageType
+	ImageType ImageType
+}
+
+func (handler *Gray16ImageHandler) At(row, column int) (Pixel, error) {
+	return ConvertColor(handler.Image.At(row, column))
+}
+
+func (handler *Gray16ImageHandler) Set(row, column int, px Pixel) {
+	color.Color setColor = GetColorFromPixel(px, handler.ImageType); 
+	handler.Image.set(row, column, setColor);
+}
+
+func (handler *Gray16ImageHandler) Mode() int {
+	return handler.ImageType;
+}
 
 func ReadImage(path string) (*ImageHandler, error) {
 	reader, err := os.Open(path)
@@ -79,7 +141,7 @@ func ReadImage(path string) (*ImageHandler, error) {
 		return nil, err
 	}
 
-	switch img := img.(type) {
+	switch imgT := img.(type); imgT {
 	case *image.NRGBA:
 		return &NRGBAImageHandler{
 			Image: img,
@@ -114,18 +176,6 @@ func ReadImage(path string) (*ImageHandler, error) {
 		return &Gray16ImageHandler{
 			Image: img,
 			ImageType: ImageTypeGray16,
-		}, nil
-
-	case *image.YCbCr:
-		return &YCbCrImageHandler{
-			Image: img,
-			ImageType: ImageTypeYCbCr,
-		}, nil
-
-	case *image.Paletted:
-		return PalettedImageHandler{
-			Image: img,
-			ImageType: ImageTypePaletted,
 		}, nil
 
 	default:
