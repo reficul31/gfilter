@@ -38,7 +38,7 @@ type ImageHandler interface {
 
 // NRGBAImageHandler struct to handle NRGBA Image
 type NRGBAImageHandler struct {
-	Image image.Image
+	Image *image.NRGBA
 	ImageType ImageType
 }
 
@@ -58,7 +58,7 @@ func (handler *NRGBAImageHandler) Set(row, column int, px Pixel) error {
 		return err
 	}
 
-	handler.Image.set(row, column, setColor)
+	handler.Image.Set(row, column, setColor)
 	return nil
 }
 
@@ -69,7 +69,7 @@ func (handler *NRGBAImageHandler) Mode() ImageType {
 
 // NRGBA64ImageHandler struct to handle NRGBA64 Image 
 type NRGBA64ImageHandler struct {
-	Image image.Image
+	Image *image.NRGBA64
 	ImageType ImageType
 }
 
@@ -89,7 +89,7 @@ func (handler *NRGBA64ImageHandler) Set(row, column int, px Pixel) error {
 		return err
 	}
 
-	handler.Image.set(row, column, setColor)
+	handler.Image.Set(row, column, setColor)
 	return nil
 }
 
@@ -100,7 +100,7 @@ func (handler *NRGBA64ImageHandler) Mode() ImageType {
 
 // RGBAImageHandler struct to handle RGBA Image
 type RGBAImageHandler struct {
-	Image image.Image
+	Image *image.RGBA
 	ImageType ImageType
 }
 
@@ -120,7 +120,7 @@ func (handler *RGBAImageHandler) Set(row, column int, px Pixel) error {
 		return err
 	}
 
-	handler.Image.set(row, column, setColor)
+	handler.Image.Set(row, column, setColor)
 	return nil
 }
 
@@ -131,7 +131,7 @@ func (handler *RGBAImageHandler) Mode() ImageType {
 
 // RGBA64ImageHandler struct to handle the RGBA64 Image
 type RGBA64ImageHandler struct {
-	Image image.Image
+	Image *image.RGBA64
 	ImageType ImageType
 }
 
@@ -151,7 +151,7 @@ func (handler *RGBA64ImageHandler) Set(row, column int, px Pixel) error {
 		return err
 	}
 
-	handler.Image.set(row, column, setColor)
+	handler.Image.Set(row, column, setColor)
 	return nil
 }
 
@@ -162,7 +162,7 @@ func (handler *RGBA64ImageHandler) Mode() ImageType {
 
 // GrayImageHandler struct to handle the Gray Image
 type GrayImageHandler struct {
-	Image image.Image
+	Image *image.Gray
 	ImageType ImageType
 }
 
@@ -182,7 +182,7 @@ func (handler *GrayImageHandler) Set(row, column int, px Pixel) error {
 		return err
 	}
 
-	handler.Image.set(row, column, setColor)
+	handler.Image.Set(row, column, setColor)
 	return nil
 }
 
@@ -193,7 +193,7 @@ func (handler *GrayImageHandler) Mode() ImageType {
 
 // Gray16ImageHandler struct to handle the Gray16 Image
 type Gray16ImageHandler struct {
-	Image image.Image
+	Image *image.Gray16
 	ImageType ImageType
 }
 
@@ -213,7 +213,7 @@ func (handler *Gray16ImageHandler) Set(row, column int, px Pixel) error {
 		return err
 	}
 
-	handler.Image.set(row, column, setColor)
+	handler.Image.Set(row, column, setColor)
 	return nil
 }
 
@@ -239,37 +239,37 @@ func ReadImage(path string) (ImageHandler, error) {
 	switch imgT := img.(type) {
 	case *image.NRGBA:
 		return &NRGBAImageHandler{
-			Image: img,
+			Image: img.(*image.NRGBA),
 			ImageType: ImageTypeNRGBA,
 		}, nil
 
 	case *image.NRGBA64:
 		return &NRGBA64ImageHandler{
-			Image: img,
+			Image: img.(*image.NRGBA64),
 			ImageType: ImageTypeNRGBA64,
 		}, nil
 
 	case *image.RGBA:
 		return &RGBAImageHandler{
-			Image: img,
+			Image: img.(*image.RGBA),
 			ImageType: ImageTypeRGBA,
 		}, nil
 
 	case *image.RGBA64:
 		return &RGBA64ImageHandler{
-			Image: img,
+			Image: img.(*image.RGBA64),
 			ImageType: ImageTypeRGBA64,
 		}, nil
 
 	case *image.Gray:
 		return &GrayImageHandler{
-			Image: img,
+			Image: img.(*image.Gray),
 			ImageType: ImageTypeGray,
 		}, nil
 
 	case *image.Gray16:
 		return &Gray16ImageHandler{
-			Image: img,
+			Image: img.(*image.Gray16),
 			ImageType: ImageTypeGray16,
 		}, nil
 
