@@ -3,6 +3,7 @@ package gfilter
 import (
 	"image"
 	"os"
+
 	// but is imported for its initialization side-effect, which allows
 	// image.Decode to understand JPEG formatted images. Uncomment these
 	// two lines to also understand GIF and PNG images:
@@ -46,7 +47,7 @@ type NRGBAImageHandler struct {
 // At returns the Pixel at row and column of the image
 func (handler *NRGBAImageHandler) At(row, column int) (Pixel, error) {
 	rect := handler.Image.Bounds()
-	if (row >= rect.Min.X && row <= rect.Max.X) || (column >= rect.Min.Y && column <= rect.Max.Y) {
+	if (row < rect.Min.X && row > rect.Max.X) || (column < rect.Min.Y && column > rect.Max.Y) {
 		return Pixel{}, ErrRowColumnOutOfBounds
 	}
 	return ConvertColor(handler.Image.At(row, column)), nil
@@ -82,7 +83,7 @@ type NRGBA64ImageHandler struct {
 // At retuns the Pixel at row and column of the image
 func (handler *NRGBA64ImageHandler) At(row, column int) (Pixel, error) {
 	rect := handler.Image.Bounds()
-	if (row >= rect.Min.X && row <= rect.Max.X) || (column >= rect.Min.Y && column <= rect.Max.Y) {
+	if (row < rect.Min.X && row > rect.Max.X) || (column < rect.Min.Y && column > rect.Max.Y) {
 		return Pixel{}, ErrRowColumnOutOfBounds
 	}
 	return ConvertColor(handler.Image.At(row, column)), nil
@@ -118,7 +119,7 @@ type RGBAImageHandler struct {
 // At returns the Pixel at row and column of the image
 func (handler *RGBAImageHandler) At(row, column int) (Pixel, error) {
 	rect := handler.Image.Bounds()
-	if (row >= rect.Min.X && row <= rect.Max.X) || (column >= rect.Min.Y && column <= rect.Max.Y) {
+	if (row < rect.Min.X && row > rect.Max.X) || (column < rect.Min.Y && column > rect.Max.Y) {
 		return Pixel{}, ErrRowColumnOutOfBounds
 	}
 	return ConvertColor(handler.Image.At(row, column)), nil
@@ -154,7 +155,7 @@ type RGBA64ImageHandler struct {
 // At returns the Pixel at row and column of the image
 func (handler *RGBA64ImageHandler) At(row, column int) (Pixel, error) {
 	rect := handler.Image.Bounds()
-	if (row >= rect.Min.X && row <= rect.Max.X) || (column >= rect.Min.Y && column <= rect.Max.Y) {
+	if (row < rect.Min.X && row > rect.Max.X) || (column < rect.Min.Y && column > rect.Max.Y) {
 		return Pixel{}, ErrRowColumnOutOfBounds
 	}
 	return ConvertColor(handler.Image.At(row, column)), nil
@@ -190,7 +191,7 @@ type GrayImageHandler struct {
 // At returns the Pixel at row and column of the image
 func (handler *GrayImageHandler) At(row, column int) (Pixel, error) {
 	rect := handler.Image.Bounds()
-	if (row >= rect.Min.X && row <= rect.Max.X) || (column >= rect.Min.Y && column <= rect.Max.Y) {
+	if (row < rect.Min.X && row > rect.Max.X) || (column < rect.Min.Y && column > rect.Max.Y) {
 		return Pixel{}, ErrRowColumnOutOfBounds
 	}
 	return ConvertColor(handler.Image.At(row, column)), nil
@@ -226,7 +227,7 @@ type Gray16ImageHandler struct {
 // At returns the Pixel at row and column of the image
 func (handler *Gray16ImageHandler) At(row, column int) (Pixel, error) {
 	rect := handler.Image.Bounds()
-	if (row >= rect.Min.X && row <= rect.Max.X) || (column >= rect.Min.Y && column <= rect.Max.Y) {
+	if (row < rect.Min.X && row > rect.Max.X) || (column < rect.Min.Y && column > rect.Max.Y) {
 		return Pixel{}, ErrRowColumnOutOfBounds
 	}
 	return ConvertColor(handler.Image.At(row, column)), nil
