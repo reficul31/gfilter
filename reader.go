@@ -2,6 +2,7 @@ package gfilter
 
 import (
 	"image"
+	"image/png"
 	"os"
 
 	// but is imported for its initialization side-effect, which allows
@@ -27,7 +28,7 @@ const (
 
 // Pixel struct to contain RGBA components for images
 type Pixel struct {
-	r, g, b, a float32
+	r, g, b, a uint32
 }
 
 // ImageHandler interface for polymorphism
@@ -36,6 +37,7 @@ type ImageHandler interface {
 	Set(row, column int, px Pixel) error
 	Mode() ImageType
 	GetDimensions() image.Rectangle
+	SaveImage(filePath string) error
 }
 
 // NRGBAImageHandler struct to handle NRGBA Image
@@ -74,6 +76,18 @@ func (handler *NRGBAImageHandler) GetDimensions() image.Rectangle {
 	return handler.Image.Bounds()
 }
 
+// SaveImage saves the image to the filepath specified
+func (handler *NRGBAImageHandler) SaveImage(filePath string) error {
+	// Encode the grayscale image to the new file
+	newfile, err := os.Create(filePath)
+	if err != nil {
+		return err
+	}
+	defer newfile.Close()
+	png.Encode(newfile, handler.Image)
+	return nil
+}
+
 // NRGBA64ImageHandler struct to handle NRGBA64 Image
 type NRGBA64ImageHandler struct {
 	Image     *image.NRGBA64
@@ -108,6 +122,18 @@ func (handler *NRGBA64ImageHandler) Mode() ImageType {
 // GetDimensions returns the dimensions as a Rectangle for the image
 func (handler *NRGBA64ImageHandler) GetDimensions() image.Rectangle {
 	return handler.Image.Bounds()
+}
+
+// SaveImage saves the image to the filepath specified
+func (handler *NRGBA64ImageHandler) SaveImage(filePath string) error {
+	// Encode the grayscale image to the new file
+	newfile, err := os.Create(filePath)
+	if err != nil {
+		return err
+	}
+	defer newfile.Close()
+	png.Encode(newfile, handler.Image)
+	return nil
 }
 
 // RGBAImageHandler struct to handle RGBA Image
@@ -146,6 +172,18 @@ func (handler *RGBAImageHandler) GetDimensions() image.Rectangle {
 	return handler.Image.Bounds()
 }
 
+// SaveImage saves the image to the filepath specified
+func (handler *RGBAImageHandler) SaveImage(filePath string) error {
+	// Encode the grayscale image to the new file
+	newfile, err := os.Create(filePath)
+	if err != nil {
+		return err
+	}
+	defer newfile.Close()
+	png.Encode(newfile, handler.Image)
+	return nil
+}
+
 // RGBA64ImageHandler struct to handle the RGBA64 Image
 type RGBA64ImageHandler struct {
 	Image     *image.RGBA64
@@ -180,6 +218,18 @@ func (handler *RGBA64ImageHandler) Mode() ImageType {
 // GetDimensions returns the dimensions as a Rectangle for the image
 func (handler *RGBA64ImageHandler) GetDimensions() image.Rectangle {
 	return handler.Image.Bounds()
+}
+
+// SaveImage saves the image to the filepath specified
+func (handler *RGBA64ImageHandler) SaveImage(filePath string) error {
+	// Encode the grayscale image to the new file
+	newfile, err := os.Create(filePath)
+	if err != nil {
+		return err
+	}
+	defer newfile.Close()
+	png.Encode(newfile, handler.Image)
+	return nil
 }
 
 // GrayImageHandler struct to handle the Gray Image
@@ -218,6 +268,18 @@ func (handler *GrayImageHandler) GetDimensions() image.Rectangle {
 	return handler.Image.Bounds()
 }
 
+// SaveImage saves the image to the filepath specified
+func (handler *GrayImageHandler) SaveImage(filePath string) error {
+	// Encode the grayscale image to the new file
+	newfile, err := os.Create(filePath)
+	if err != nil {
+		return err
+	}
+	defer newfile.Close()
+	png.Encode(newfile, handler.Image)
+	return nil
+}
+
 // Gray16ImageHandler struct to handle the Gray16 Image
 type Gray16ImageHandler struct {
 	Image     *image.Gray16
@@ -252,6 +314,18 @@ func (handler *Gray16ImageHandler) Mode() ImageType {
 // GetDimensions returns the dimensions as a Rectangle for the image
 func (handler *Gray16ImageHandler) GetDimensions() image.Rectangle {
 	return handler.Image.Bounds()
+}
+
+// SaveImage saves the image to the filepath specified
+func (handler *Gray16ImageHandler) SaveImage(filePath string) error {
+	// Encode the grayscale image to the new file
+	newfile, err := os.Create(filePath)
+	if err != nil {
+		return err
+	}
+	defer newfile.Close()
+	png.Encode(newfile, handler.Image)
+	return nil
 }
 
 // ReadImage reads the image from the specified path
