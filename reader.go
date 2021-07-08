@@ -2,6 +2,7 @@ package gfilter
 
 import (
 	"image"
+	"image/color/palette"
 	"image/png"
 	"os"
 
@@ -24,6 +25,7 @@ const (
 	ImageTypeRGBA64
 	ImageTypeGray
 	ImageTypeGray16
+	ImageTypePaletted
 )
 
 // Pixel struct to contain RGBA components for images
@@ -328,6 +330,53 @@ func (handler *Gray16ImageHandler) SaveImage(filePath string) error {
 	return nil
 }
 
+// Gray16ImageHandler struct to handle the Gray16 Image
+type PalettedImageHandler struct {
+	Image     *image.Paletted
+	ImageType ImageType
+}
+
+// At returns the Pixel at row and column of the image
+func (handler *PalettedImageHandler) At(row, column int) (Pixel, error) {
+	rect := handler.Image.Bounds()
+	if (row < rect.Min.X && row > rect.Max.X) || (column < rect.Min.Y && column > rect.Max.Y) {
+		return Pixel{}, ErrRowColumnOutOfBounds
+	}
+	return ConvertColor(handler.Image.At(row, column)), nil
+}
+
+// Set sets the Pixel at row and column of the image
+func (handler *PalettedImageHandler) Set(row, column int, px Pixel) error {
+	setColor, err := GetColorFromPixel(px, handler.ImageType)
+	if err != nil {
+		return err
+	}
+
+	handler.Image.Set(row, column, setColor)
+	return nil
+}
+
+// Mode returns the ImageType of the images
+func (handler *PalettedImageHandler) Mode() ImageType {
+	return handler.ImageType
+}
+
+// GetDimensions returns the dimensions as a Rectangle for the image
+func (handler *PalettedImageHandler) GetDimensions() image.Rectangle {
+	return handler.Image.Bounds()
+}
+
+// SaveImage saves the image to the filepath specified
+func (handler *PalettedImageHandler) SaveImage(filePath string) error {
+	newfile, err := os.Create(filePath)
+	if err != nil {
+		return err
+	}
+	defer newfile.Close()
+	png.Encode(newfile, handler.Image)
+	return nil
+}
+
 // ReadImage reads the image from the specified path
 // it will return the interface ImageHandler of the
 // correct type specified in the image
@@ -379,6 +428,12 @@ func ReadImage(path string) (ImageHandler, error) {
 			ImageType: ImageTypeGray16,
 		}, nil
 
+	case *image.Paletted:
+		return &PalettedImageHandler{
+			Image:     img.(*image.Paletted),
+			ImageType: ImageTypePaletted,
+		}, nil
+
 	default:
 		return nil, ErrUnsupportedImageFormat
 	}
@@ -422,6 +477,12 @@ func New(imgT ImageType, dimensions image.Rectangle) (ImageHandler, error) {
 		return &Gray16ImageHandler{
 			Image:     image.NewGray16(dimensions),
 			ImageType: ImageTypeGray16,
+		}, nil
+
+	case ImageTypePaletted:
+		return &PalettedImageHandler{
+			Image:     image.NewPaletted(dimensions, palette.Plan9),
+			ImageType: ImageTypePaletted,
 		}, nil
 	default:
 		return nil, ErrUnsupportedImageFormat

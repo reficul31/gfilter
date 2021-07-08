@@ -15,6 +15,9 @@ func ConvertColor(c color.Color) Pixel {
 // GetColorFromPixel converts Pixel to color.Color
 func GetColorFromPixel(px Pixel, imageType ImageType) (color.Color, error) {
 	switch imageType {
+	case ImageTypePaletted:
+		return color.RGBA{R: uint8(px.r), G: uint8(px.g), B: uint8(px.b), A: uint8(px.a)}, nil
+
 	case ImageTypeNRGBA:
 		return color.NRGBA{R: uint8(px.r), G: uint8(px.g), B: uint8(px.b), A: uint8(px.a)}, nil
 
