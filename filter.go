@@ -24,7 +24,7 @@ func CreateKernel(values []float32, rows, columns int) (*Kernel, error) {
 	}
 
 	var sum float32
-	if sum <= 0 {
+	if totalsum <= 0 {
 		sum = possum
 	} else {
 		sum = totalsum

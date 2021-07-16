@@ -4,7 +4,7 @@ package gfilter
 // on the given image. It makes a copy and returns the filtered image
 // without modifying the src image.
 func Apply(filter *Kernel, src ImageHandler) (ImageHandler, error) {
-	result, err := New(src.Mode(), src.GetDimensions())
+	result, err := New(ImageTypeNRGBA64, src.GetDimensions())
 	if err != nil {
 		return nil, err
 	}
